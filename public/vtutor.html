@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VTutor</title>
+  </head>
+  <body>
+    <canvas id="avatarCanvas"></canvas>
+    <script>
+      window.addEventListener('message', (e) => {
+        if (e.data.action === 'speak') {
+          const { text, audioUrl } = e.data
+          console.log('VTutor speaking:', text)
+          const audio = new Audio(audioUrl)
+          audio.play()
+          // Add lip animation logic here
+        }
+      })
+    </script>
+  </body>
+</html>
