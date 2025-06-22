@@ -1,6 +1,7 @@
 export const callUnrealSpeech = async (text: string) => {
     const config = useRuntimeConfig()
     const apiKey = config.unrealSpeechKey
+    console.log(apiKey,"------------------------------------------------")
   
     const voice = 'ai1-JpFemale1' // Example Japanese voice (you may need to verify this voice exists)
     const response = await fetch('https://api.v6.unrealspeech.com/speech', {
