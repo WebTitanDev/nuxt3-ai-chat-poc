@@ -38,12 +38,17 @@ const triggerVTutor = () => {
 
 <style scoped>
 .chat-container {
-  max-width: 700px;
-  margin: 40px auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* perfectly centers the box */
+  max-width: 800px;
+  width: 800px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  z-index: 999;
 }
 :global(body) {
   background: url('/background.jpg') no-repeat center center fixed;
@@ -53,7 +58,6 @@ const triggerVTutor = () => {
 .chat-input {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
 .chat-input input {
