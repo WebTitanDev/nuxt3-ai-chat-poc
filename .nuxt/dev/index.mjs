@@ -1782,28 +1782,34 @@ const fetchGroqReply = async (message) => {
 const callUnrealSpeech = async (text) => {
   const config = useRuntimeConfig();
   const apiKey = config.unrealSpeechKey;
-  console.log(apiKey, "------------------------------------------------");
-  const voice = "ai1-JpFemale1";
+  const voice = "Liv";
+  const body = {
+    Text: text,
+    VoiceId: voice,
+    OutputFormat: "mp3",
+    Bitrate: "192k",
+    Speed: 1
+  };
+  console.log("\u25B6 Sending to UnrealSpeech:", body);
+  console.log("\u25B6 Using API Key:", apiKey);
   const response = await fetch("https://api.v6.unrealspeech.com/speech", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      Text: text,
-      VoiceId: voice,
-      OutputFormat: "mp3",
-      Bitrate: "192k",
-      Speed: 1
-    })
+    body: JSON.stringify(body)
   });
+  console.log("\u{1F534} UnrealSpeech Response:", response.statusText, "---------------");
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error("\u{1F53B} UnrealSpeech Error:", errorText);
     throw new Error("UnrealSpeech TTS failed");
   }
   const data = await response.json();
+  console.log("lololololo", data);
   return {
-    audioUrl: data.Url,
+    audioUrl: data.OutputUri,
     ttsProvider: "UnrealSpeech"
   };
 };
@@ -1821,7 +1827,7 @@ const callGoogleTTS = async (text) => {
       voice: {
         languageCode: "ja-JP",
         name: "ja-JP-Wavenet-A"
-        // Choose a Japanese voice
+        // Natural-sounding Japanese voice
       },
       audioConfig: {
         audioEncoding: "MP3",
@@ -1830,6 +1836,8 @@ const callGoogleTTS = async (text) => {
     })
   });
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error("\u{1F53B} Google TTS error:", errorText);
     throw new Error("Google TTS failed");
   }
   const result = await response.json();
@@ -1840,16 +1848,21 @@ const callGoogleTTS = async (text) => {
 };
 
 const tryTTSFallback = async (text) => {
+  const isJapanese = /[\u3000-\u30FF\u4E00-\u9FAF\uFF66-\uFF9D]/.test(text);
   try {
-    return await callUnrealSpeech(text);
-  } catch {
-    try {
+    if (isJapanese) {
+      console.log("japanese--------------");
       return await callGoogleTTS(text);
+    } else {
+      console.log("English--------------");
+      return await callUnrealSpeech(text);
+    }
+  } catch (err1) {
+    console.warn("\u26A0 Primary TTS failed, trying fallback");
+    try {
+      return isJapanese ? await callUnrealSpeech(text) : await callGoogleTTS(text);
     } catch {
-      return {
-        audioUrl: "",
-        ttsProvider: "none"
-      };
+      return { audioUrl: "", ttsProvider: "none" };
     }
   }
 };
