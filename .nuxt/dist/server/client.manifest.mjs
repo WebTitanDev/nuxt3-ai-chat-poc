@@ -1,1 +1,1 @@
-export { default } from "file:///C:/web/reservation_system/nuxt3-ai-chat-poc/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"
+export { default } from "file:///C:/work/nuxt3-ai-chat-poc/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"
