@@ -8,8 +8,6 @@ interface GroqChatCompletion {
 
 export const fetchGroqReply = async (message: string): Promise<string> => {
   const config = useRuntimeConfig()
-  console.log(config.groqApiKey,"----------------");
-  
   const response = await $fetch<GroqChatCompletion>('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
