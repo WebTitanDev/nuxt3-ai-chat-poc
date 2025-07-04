@@ -22,7 +22,6 @@ export const callGoogleTTS = async (text: string) => {
 
   if (!response.ok) {
     const errorText = await response.text()
-    console.error('🔻 Google TTS error:', errorText)
     throw new Error('Google TTS failed')
   }
 
