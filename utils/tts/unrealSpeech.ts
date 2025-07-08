@@ -2,7 +2,7 @@ export const callUnrealSpeech = async (text: string) => {
   const config = useRuntimeConfig()
   const apiKey = config.unrealSpeechKey
 
-  const voice = 'Yuki' // Allowed VoiceIds: Eleanor, Melody, Javier, Amelia, Sheng, Lian, Jasper, Lauren, Luna, Sierra, af, Edward, Charlotte, Caleb, Priya, Wei, Ting, Sakura, Chloe, Noah, Rina, Kaitlyn, Luca, Emily, Jing, Rowan, Hana, Benjamin, Maddie, Ronan, Mateo, Autumn, Arthur, Willow, Daniel, Lucía, Rafael, Oliver, Yuki, Rohan, Jian, Arjun, Élodie, Thiago, Giulia, Ananya, Camila, Zane, Ethan, Hao, Mei, Ivy, Hannah, Haruto
+  const voice = 'Edward' // Allowed VoiceIds: Eleanor, Melody, Javier, Amelia, Sheng, Lian, Jasper, Lauren, Luna, Sierra, af, Edward, Charlotte, Caleb, Priya, Wei, Ting, Sakura, Chloe, Noah, Rina, Kaitlyn, Luca, Emily, Jing, Rowan, Hana, Benjamin, Maddie, Ronan, Mateo, Autumn, Arthur, Willow, Daniel, Lucía, Rafael, Oliver, Yuki, Rohan, Jian, Arjun, Élodie, Thiago, Giulia, Ananya, Camila, Zane, Ethan, Hao, Mei, Ivy, Hannah, Haruto
   const body = {
     Text: text,
     VoiceId: voice,

@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>VTutor</title>
   <style>
     body {
       margin: 0;
-      background: #111;
+      /* background: #111; */
     }
+
     canvas {
       display: block;
       width: 100%;
       height: 100vh;
-      background-color: #222;
+      /* background-color: #222; */
     }
   </style>
 </head>
+
 <body>
   <canvas id="avatarCanvas"></canvas>
   <script>
@@ -37,42 +40,42 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Draw base avatar image
       if (avatar.complete) {
         ctx.drawImage(avatar, cx - 150, cy - 200, 300, 400)
       }
 
-      // Draw mouth (scaled)
       if (mouth.complete) {
-        const mouthW = 50
+        const mouthW = 40
         const mouthH = 20 * mouthScale
         ctx.drawImage(mouth, cx - mouthW / 2, cy + 20 - mouthH / 2, mouthW, mouthH)
       }
 
-      // Draw expressions (eyebrows)
       ctx.strokeStyle = '#000'
-      ctx.lineWidth = 4
+      ctx.lineWidth = 5
       ctx.beginPath()
 
+      // Eyebrows: slightly longer, closer together
       if (emotion === 'angry') {
-        ctx.moveTo(cx - 60, cy - 80)
-        ctx.lineTo(cx - 40, cy - 90)
-        ctx.moveTo(cx + 40, cy - 90)
-        ctx.lineTo(cx + 60, cy - 80)
+        ctx.moveTo(cx - 48, cy - 60)
+        ctx.lineTo(cx - 16, cy - 62)
+        ctx.moveTo(cx + 16, cy - 62)
+        ctx.lineTo(cx + 48, cy - 60)
       } else if (emotion === 'happy') {
-        ctx.moveTo(cx - 60, cy - 80)
-        ctx.lineTo(cx - 40, cy - 70)
-        ctx.moveTo(cx + 40, cy - 70)
-        ctx.lineTo(cx + 60, cy - 80)
+        ctx.moveTo(cx - 48, cy - 60)
+        ctx.lineTo(cx - 16, cy - 57)
+        ctx.moveTo(cx + 16, cy - 55)
+        ctx.lineTo(cx + 48, cy - 60)
       } else {
-        ctx.moveTo(cx - 60, cy - 80)
-        ctx.lineTo(cx - 40, cy - 80)
-        ctx.moveTo(cx + 40, cy - 80)
-        ctx.lineTo(cx + 60, cy - 80)
+        ctx.moveTo(cx - 48, cy - 60)
+        ctx.lineTo(cx - 16, cy - 60)
+        ctx.moveTo(cx + 16, cy - 60)
+        ctx.lineTo(cx + 48, cy - 60)
       }
+
 
       ctx.stroke()
     }
+
 
     avatar.onload = drawAvatar
     mouth.onload = drawAvatar
@@ -82,41 +85,56 @@
         const { text, audioUrl } = e.data
         console.log('VTutor speaking:', text)
 
+
         const audio = new Audio(audioUrl)
+        audio.crossOrigin = 'anonymous'  // For external audio
+
         const context = new AudioContext()
         const source = context.createMediaElementSource(audio)
         const analyser = context.createAnalyser()
-        const dataArray = new Uint8Array(analyser.frequencyBinCount)
+        analyser.fftSize = 2048
+        const dataArray = new Uint8Array(analyser.fftSize)
 
         source.connect(analyser)
         analyser.connect(context.destination)
 
-        await audio.play()
+        audio.onplay = () => {
+          console.log('Audio is playing. Starting animation.')
+          function animate() {
+            requestAnimationFrame(animate)
+            analyser.getByteTimeDomainData(dataArray)
 
-        function animate() {
-          requestAnimationFrame(animate)
-          analyser.getByteTimeDomainData(dataArray)
+            let sum = 0
+            let currentMouthScale = 1
+            for (let i = 0; i < dataArray.length; i++) {
+              const v = dataArray[i] - 128
+              sum += v * v
+            }
 
-          let sum = 0
-          for (let i = 0; i < dataArray.length; i++) {
-            const v = dataArray[i] - 128
-            sum += v * v
+            const volume = Math.sqrt(sum / dataArray.length)
+            const targetScale  = Math.min(Math.max(volume / 10, 0.3), 2)
+            currentMouthScale += (targetScale - currentMouthScale) * 0.5
+
+            if (volume > 15) emotion = 'angry'
+            else if (volume > 7) emotion = 'happy'
+            else emotion = 'neutral'
+
+            drawAvatar({ mouthScale: currentMouthScale, emotion })
           }
 
-          const volume = Math.sqrt(sum / dataArray.length)
-          const scale = Math.min(Math.max(volume / 10, 0.3), 2.0)
-
-          // Basic emotion logic based on volume
-          if (volume > 15) emotion = 'angry'
-          else if (volume > 7) emotion = 'happy'
-          else emotion = 'neutral'
-
-          drawAvatar({ mouthScale: scale, emotion })
+          animate()
         }
+        setTimeout(async () => {
+          try {
+            await audio.play()
+          } catch (err) {
+            console.error("Audio playback failed:", err)
+          }
+        }, 2000);
 
-        animate()
       }
     })
   </script>
 </body>
+
 </html>

@@ -1,6 +1,5 @@
 <template>
   <div class="chat-container">    
-    <audio :src="audioUrl" ref="player" @play="triggerVTutor" />
     <iframe ref="vtutor" src="/vtutor.html" width="640" height="480"></iframe>
     <div class="chat-input">
       <input v-model="msg" @keyup.enter="send" placeholder="メッセージを入力" />
@@ -20,12 +19,21 @@ const send = async () => {
     method: 'POST',
     body: { message: msg.value }
   })
+
   audioUrl.value = res.audioUrl
   console.log(audioUrl.value)
+
   await nextTick()
-  player.value.play()
+
+  vtutor.value?.contentWindow?.postMessage({
+    action: 'speak',
+    text: msg.value,
+    audioUrl: audioUrl.value
+  }, '*')
+
   msg.value = ''
 }
+
 
 const triggerVTutor = () => {
   vtutor.value?.contentWindow?.postMessage({
