@@ -112,8 +112,8 @@
             }
 
             const volume = Math.sqrt(sum / dataArray.length)
-            const targetScale  = Math.min(Math.max(volume / 10, 0.3), 2)
-            currentMouthScale += (targetScale - currentMouthScale) * 0.5
+            const targetScale  = Math.min(Math.max(volume / 10, 0.3), 1.2)
+            currentMouthScale += (targetScale - currentMouthScale) * 0.1
 
             if (volume > 15) emotion = 'angry'
             else if (volume > 7) emotion = 'happy'
